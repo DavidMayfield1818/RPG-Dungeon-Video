@@ -83,6 +83,33 @@ public class MapGenerator : MonoBehaviour
         // this is public so can be called from outside
         public void CleanUp()
         {
+            // make 3 horizontal and 4 vertical hallways
+            var row1 = Random.Range(2,height/3);
+            var row2 = Random.Range(height/3,height/3*2);
+            var row3 = Random.Range(height/3*2,height-2);
+            var col1 = Random.Range(2,width/4);
+            var col2 = Random.Range(width/4,width/4*2);
+            var col3 = Random.Range(width/4*2,width/4*3);
+            var col4 = Random.Range(width/4*3,width-2);
+
+            // slice
+            for(int x = 1; x < width-1; x++)
+            {
+                map[x,row1] = 0;
+                map[x,row2] = 0;
+                map[x,row3] = 0;
+            }
+
+            // slice
+            for(int y = 1; y < height-1; y++)
+            {
+                map[col1,y] = 0;
+                map[col2,y] = 0;
+                map[col3,y] = 0;
+                map[col4,y] = 0;
+            }
+
+            // soften
             for(int x = 1; x < width-1; x++)
             {
                 for(int y = 1; y < height-1; y++)

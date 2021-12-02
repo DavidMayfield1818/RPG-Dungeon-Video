@@ -7,8 +7,8 @@ public class WeaponScript : MonoBehaviour
 {
     private bool swing = false;
     int degree = 0;
-    private float weaponY = -0.4f;
-    private float weaponX = 0.3f;
+    private float weaponY = 0f;
+    private float weaponX = 0f;
     public Sprite[] upgrades;
     private int spriteIndex = 0;
     public float weaponPower = 1.0f;
@@ -46,13 +46,13 @@ public class WeaponScript : MonoBehaviour
     {
         if(player.GetComponent<PlayerScript>().turnedLeft)
         {
-            transform.localScale = new Vector3(-1.8f, 1.8f, 1);
-            weaponX = -0.3f;
+            transform.localScale = new Vector3(-0.8f, -0.8f, 1);
+            weaponX = -0.1f;
         }
         else
         {
-            transform.localScale = new Vector3(1.8f, 1.8f, 1);
-            weaponX = 0.3f;
+            transform.localScale = new Vector3(0.8f, 0.8f, 1);
+            weaponX = 0.1f;
         }
         pos = player.transform.position;
         pos.x += weaponX;
