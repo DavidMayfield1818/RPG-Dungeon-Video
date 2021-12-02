@@ -31,6 +31,8 @@ public class PlayerScript : MonoBehaviour
         mainText.gameObject.SetActive(true);
         redOverlay.gameObject.SetActive(true);
         Invoke("HideTitle", 2);
+
+        // add our variables starting values
     }
 
     // Update is called once per frame
@@ -40,10 +42,10 @@ public class PlayerScript : MonoBehaviour
         vertical = Input.GetAxisRaw("Vertical");
 
         rb.velocity = new Vector2(horizontal * speed, vertical * speed);
-        turnedLeft = false;
         if (horizontal > 0)
         {
             GetComponent<Animator>().Play("Right");
+            turnedLeft = false;
         } else if (horizontal < 0)
         {
             GetComponent<Animator>().Play("Left");
