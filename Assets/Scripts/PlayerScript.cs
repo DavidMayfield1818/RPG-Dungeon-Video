@@ -12,6 +12,16 @@ public class PlayerScript : MonoBehaviour
 
     private float health = 200;
     private float startHealth;
+    
+    //Trackers for map generation 
+    private Transform target; // for player postion 
+    public float healthAtEndOfLevel;
+    public int totalZombies = 0;
+    public int totalKilled = 0;
+    public float timeToFinishLevel;
+    public float xStart; // based off the point of entry 
+    public float yStart; // on previous level 
+    public int itemsCollected = 0;
 
     public bool turnedLeft = false;
     public Image healthFill;
@@ -25,6 +35,7 @@ public class PlayerScript : MonoBehaviour
 
     void Start()
     {
+        
         rb = GetComponent<Rigidbody2D>();
         healthWidth = healthFill.sprite.rect.width;
         startHealth = health;
@@ -33,6 +44,7 @@ public class PlayerScript : MonoBehaviour
         Invoke("HideTitle", 2);
 
         // add our variables starting values
+        target = GameObject.Find("Player").transform;
     }
 
     // Update is called once per frame
@@ -59,6 +71,67 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+
+    /// public functions for trackers 
+    public void SetHealthEnd()
+    {
+        healthAtEndOfLevel = health;
+    }
+
+    public float GetHealthEnd()
+    {
+        return healthAtEndOfLevel;
+    }
+
+    public void SetZombieStats(int amount){
+        if (amount < 0) {
+            totalKilled+= (amount)*(-1);
+        }
+        else {
+            totalZombies += amount ;
+        }
+    }
+
+    public int GetTotalZombies()
+    {
+        return totalZombies;
+    }
+
+    public int GetTotalKilled()
+    {
+        return totalKilled;
+    }
+
+    public void SetTimeToFinishLevel(){
+        timeToFinishLevel = Time.time - timeToFinishLevel;
+    }
+    
+    public float GetTimeToFinishLevel() {
+        return timeToFinishLevel;
+    }
+
+    
+    public void SetStartPostion(){
+        xStart = target.position.x;
+        yStart = target.position.y;
+    }
+    
+    public float GetStartX() {
+        return xStart;
+    }
+
+    public float GetStartY() {
+        return yStart;
+    }
+    public void SetItemsCollected() {
+        itemsCollected += 1;
+    }
+
+    public int GetItemsCollected(){
+        return itemsCollected;
+    }
+    // end of trackers
+ 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
@@ -80,7 +153,7 @@ public class PlayerScript : MonoBehaviour
         {
             collision.gameObject.GetComponent<SpawnerScript>().GetGatewayWeapon();
         }
-}
+    }
 
     void HidePlayerBlood()
     {
@@ -98,4 +171,5 @@ public class PlayerScript : MonoBehaviour
         mainText.gameObject.SetActive(false);
         redOverlay.gameObject.SetActive(false);
     }
+
 }

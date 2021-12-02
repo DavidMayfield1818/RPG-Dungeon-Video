@@ -20,7 +20,10 @@ public class SpawnerScript : MonoBehaviour
     public Sprite[] sprites;
 
     private GameManager gameManager;
-
+    // for tracker
+    public GameObject player;
+    public float activeTime;  
+      
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -71,7 +74,14 @@ public class SpawnerScript : MonoBehaviour
             Invoke("DefaultColor", 0.3f);
         }
     }
-
+    //Tracker
+    public void setActiveTime(){
+        activeTime = Time.time - player.GetComponent<PlayerScript>().GetTimeToFinishLevel();
+    }
+    
+    public float getActiveTime() {
+        return activeTime;
+    }
     private void OpenGateway()
     {
         GetComponent<SpriteRenderer>().sprite = gateway;
@@ -79,6 +89,7 @@ public class SpawnerScript : MonoBehaviour
 
     private void DestroySpawner()
     {
+        setActiveTime();
         Destroy(gameObject);
     }
 
@@ -112,6 +123,8 @@ public class SpawnerScript : MonoBehaviour
     public void SetWeapon(bool maybe)
     {
         isWeaponUpgrade = true;
+        player.GetComponent<PlayerScript>().SetItemsCollected();
+    
     }
 
     private void OpenWeapon()

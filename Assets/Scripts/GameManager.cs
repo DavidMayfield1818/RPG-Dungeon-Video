@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     private int currentScene = 0;
     private int zombieCount = 0;
     private int zombieLimit = 10;
-
+  
     public GameObject player;
     public GameObject weapon;
     public GameObject hudCanvas;
@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
     public void SetZombieCount(int amount)
     {
         zombieCount += amount;
+        player.GetComponent<PlayerScript>().SetZombieStats(amount);
     }
 
     public int GetZombieCount()
@@ -79,7 +80,11 @@ public class GameManager : MonoBehaviour
 
     public void LoadLevel()
     {
+        player.GetComponent<PlayerScript>().SetHealthEnd();
+        player.GetComponent<PlayerScript>().SetTimeToFinishLevel();
         zombieCount = 0;
+        player.GetComponent<PlayerScript>().totalKilled = 0;
+        player.GetComponent<PlayerScript>().totalZombies = 0;
         if (SceneManager.GetActiveScene().buildIndex != 2)
         {
             currentScene = 1;
@@ -88,6 +93,7 @@ public class GameManager : MonoBehaviour
             currentScene = -1;
         }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + currentScene);
+        player.GetComponent<PlayerScript>().SetStartPostion();
     }
 
     public int GetLevel()
