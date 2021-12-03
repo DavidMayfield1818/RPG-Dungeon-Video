@@ -41,6 +41,7 @@ public class SpawnerScript : MonoBehaviour
 
     void Update()
     {
+         setActiveTime();
         if(timer<Time.time && gameManager.GetZombieCount()< gameManager.GetZombieLimit())
         {
             if (GetComponent<SpriteRenderer>().sprite != gateway)
@@ -93,8 +94,8 @@ public class SpawnerScript : MonoBehaviour
 
     public void DestroySpawner()
     {
-        setActiveTime();
         Destroy(gameObject);
+        player.GetComponent<PlayerScript>().SetSpawnerDestroyed();
     }
 
     private void DefaultColor()
@@ -123,13 +124,14 @@ public class SpawnerScript : MonoBehaviour
         {
             GameObject.Find("Weapon").GetComponent<WeaponScript>().UpgradeWeapon();
             Destroy(gameObject);
+            player = GameObject.FindGameObjectWithTag("Player");
+            player.GetComponent<PlayerScript>().SetItemsCollected();
         }
     }
 
     public void SetWeapon(bool maybe)
     {
         isWeaponUpgrade = true;
-        //player.GetComponent<PlayerScript>().SetItemsCollected();
     
     }
 

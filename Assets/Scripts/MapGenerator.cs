@@ -7,6 +7,7 @@ using UnityEngine.Tilemaps;
 
 public class MapGenerator : MonoBehaviour
 {   
+    public static GameObject player;
     public class level
     {
         // this class contains one level
@@ -14,8 +15,6 @@ public class MapGenerator : MonoBehaviour
         public int[,] map;
         public int width;
         public int height;
-        
-
         // contructor
         // this is public so can be called from outside
         public level(int w, int h)
@@ -81,7 +80,9 @@ public class MapGenerator : MonoBehaviour
 
             // random count of spawners
             int rng = Random.Range(1,15);
-
+            //track spawners generated 
+            player = GameObject.FindGameObjectWithTag("Player");
+            player.GetComponent<PlayerScript>().SetSpawnerGen(rng);
             // place em
             for(int i = 0; i < rng; i++)
             {
@@ -190,6 +191,7 @@ public class MapGenerator : MonoBehaviour
                     }
                 }
             }
+        player.GetComponent<PlayerScript>().copyMap(map, width, height);
         }
     }
 
@@ -209,6 +211,8 @@ public class MapGenerator : MonoBehaviour
     public Vector3 spawn;
     public Vector3Int mapSpawn;
 
+    //for trackers 
+    // public GameObject player;
     void DrawMap(level lvl)
 	{
 		for(int x = 0; x < lvl.width; x++)
@@ -300,5 +304,15 @@ public class MapGenerator : MonoBehaviour
         
         // last step before running the map
         gameMan.PrepareSpawners();
+
+        //update trackers
+        GameObject player;
+        player = GameObject.FindGameObjectWithTag("Player");
+        player.GetComponent<PlayerScript>().SetHealthEnd();
+        player.GetComponent<PlayerScript>().SetTimeToFinishLevel();
+        player.GetComponent<PlayerScript>().SetStartPostion();
+        player.GetComponent<PlayerScript>().totalKilled = 0;
+        player.GetComponent<PlayerScript>().totalZombies = 0;
+        player.GetComponent<PlayerScript>().spawnerDestroyed = 0;
     }
 }

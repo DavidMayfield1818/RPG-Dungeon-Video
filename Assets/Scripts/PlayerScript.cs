@@ -14,14 +14,19 @@ public class PlayerScript : MonoBehaviour
     private float startHealth;
     
     //Trackers for map generation 
-    private Transform target; // for player postion 
+     
     public float healthAtEndOfLevel;
     public int totalZombies = 0;
     public int totalKilled = 0;
     public float timeToFinishLevel;
-    public float xStart; // based off the point of entry 
-    public float yStart; // on previous level 
+    public float xStart = 0; // based off the point of entry 
+    public float yStart = 0; // on previous level 
     public int itemsCollected = 0;
+    public int spawnerDestroyed = 0;
+    public int spawnersGen = 0;
+    public int[,] explored;
+    
+    //
 
     public bool turnedLeft = false;
     public Image healthFill;
@@ -43,13 +48,12 @@ public class PlayerScript : MonoBehaviour
         redOverlay.gameObject.SetActive(true);
         Invoke("HideTitle", 2);
 
-        // add our variables starting values
-        target = GameObject.Find("Player").transform;
     }
 
     // Update is called once per frame
     void Update()
     {
+        updateExplored();
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
 
@@ -112,8 +116,8 @@ public class PlayerScript : MonoBehaviour
 
     
     public void SetStartPostion(){
-        xStart = target.position.x;
-        yStart = target.position.y;
+        xStart = GameObject.FindGameObjectWithTag("Player").transform.position.x;
+        yStart = GameObject.FindGameObjectWithTag("Player").transform.position.y;
     }
     
     public float GetStartX() {
@@ -130,6 +134,31 @@ public class PlayerScript : MonoBehaviour
     public int GetItemsCollected(){
         return itemsCollected;
     }
+
+    public void SetSpawnerDestroyed() {
+        spawnerDestroyed += 1;
+    }
+    
+    public int GetSpawnerDestroyed() {
+        return spawnerDestroyed;
+    }
+    
+    public void SetSpawnerGen(int amount){
+        spawnersGen  = amount;
+    }
+
+    public int GetSpawnerGen(){
+        return spawnersGen; 
+    }
+
+    public void copyMap(int[,] map, int width , int height){
+        explored = map;    
+    }
+    public void updateExplored(){
+        explored[(int)GameObject.FindGameObjectWithTag("Player").transform.position.x,
+         (int)GameObject.FindGameObjectWithTag("Player").transform.position.y] = 3; 
+    }
+
     // end of trackers
  
     private void OnCollisionEnter2D(Collision2D collision)

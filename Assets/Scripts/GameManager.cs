@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
             //Debug.Log("Position: "+rnd);
             spawners[rnd].GetComponent<SpawnerScript>().SetGateway(true);
             // Weapon Upgrade testing
-            if(Random.Range(0, 5) == 3)
+            if(Random.Range(0, 0) == 0)
             {
                 int randTemp = Random.Range(0, spawners.Length);
                 spawners[randTemp].GetComponent<SpawnerScript>().SetWeapon(true);
