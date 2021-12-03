@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject[] spawners;
     private int level = 0;
     private int currentScene = 0;
     private int zombieCount = 0;
@@ -14,12 +13,13 @@ public class GameManager : MonoBehaviour
     public GameObject player;
     public GameObject weapon;
     public GameObject hudCanvas;
+    public MapGenerator MapGenerator;
 
     private Scene scene;
 
     void Start()
     {
-        PrepareSpawners();
+        
     }
 
     void Awake()
@@ -42,12 +42,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void PrepareSpawners()
+    public void PrepareSpawners()
     {
+        GameObject[] spawners;
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         if(spawners.Length > 0)
         {
+            //Debug.Log("After new: "+spawners.Length);
             int rnd = Random.Range(0, spawners.Length);
+            //Debug.Log("Position: "+rnd);
             spawners[rnd].GetComponent<SpawnerScript>().SetGateway(true);
             // Weapon Upgrade testing
             if(Random.Range(0, 5) == 3)

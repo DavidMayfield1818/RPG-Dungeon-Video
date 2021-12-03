@@ -7,7 +7,7 @@ public class PlayerScript : MonoBehaviour
 {
     private float horizontal;
     private float vertical;
-    private float speed = 4.0f;
+    private float speed = 2.5f;
     Rigidbody2D rb;
 
     private float health = 200;

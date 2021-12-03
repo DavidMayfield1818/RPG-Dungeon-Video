@@ -46,6 +46,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -109,8 +110,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7295869816734815675}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: -0.5, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7295869814914591506}
   m_Father: {fileID: 0}
@@ -131,6 +132,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -235,4 +237,3 @@ MonoBehaviour:
   - {fileID: 1535090301705942816, guid: ed56d4ec6dee4424395e3675cbd6d50a, type: 3}
   - {fileID: -6129858168906040132, guid: 8d3ba4eb416a9314cb1b9b46f78af398, type: 3}
   - {fileID: -5125034019698823287, guid: 781cb25292a80c24bad63bf87aeb708d, type: 3}
-  gameManager: {fileID: 0}

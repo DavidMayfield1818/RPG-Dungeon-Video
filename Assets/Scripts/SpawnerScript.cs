@@ -12,7 +12,7 @@ public class SpawnerScript : MonoBehaviour
     private float health = 5;
     public Sprite deathSprite;
     public Sprite gateway;
-    private bool isGateway = false;
+    public bool isGateway = false;
 
     public Sprite weaponUpgrade;
     private bool isWeaponUpgrade = false;
@@ -23,6 +23,8 @@ public class SpawnerScript : MonoBehaviour
     // for tracker
     public GameObject player;
     public float activeTime;  
+
+    public MapGenerator Gen;
       
     void Start()
     {
@@ -33,6 +35,8 @@ public class SpawnerScript : MonoBehaviour
         int rnd = Random.Range(0, sprites.Length);
         GetComponent<SpriteRenderer>().sprite = sprites[rnd];
         gameManager.SetZombieCount(2);
+        player = gameManager.player;
+        Gen = gameManager.MapGenerator;
     }
 
     void Update()
@@ -87,7 +91,7 @@ public class SpawnerScript : MonoBehaviour
         GetComponent<SpriteRenderer>().sprite = gateway;
     }
 
-    private void DestroySpawner()
+    public void DestroySpawner()
     {
         setActiveTime();
         Destroy(gameObject);
@@ -112,7 +116,9 @@ public class SpawnerScript : MonoBehaviour
     {
         if(GetComponent<SpriteRenderer>().sprite == gateway)
         {
-            gameManager.LoadLevel();
+            // change how dis works here
+            Gen.PutMapOnScreen();
+
         } else if (GetComponent<SpriteRenderer>().sprite == weaponUpgrade)
         {
             GameObject.Find("Weapon").GetComponent<WeaponScript>().UpgradeWeapon();
@@ -123,7 +129,7 @@ public class SpawnerScript : MonoBehaviour
     public void SetWeapon(bool maybe)
     {
         isWeaponUpgrade = true;
-        player.GetComponent<PlayerScript>().SetItemsCollected();
+        //player.GetComponent<PlayerScript>().SetItemsCollected();
     
     }
 

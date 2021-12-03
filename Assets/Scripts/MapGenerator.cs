@@ -27,7 +27,7 @@ public class MapGenerator : MonoBehaviour
             clearLevel();
         }
 
-        // filles teh area with all 0's
+        // filles the area with all 0's
         // requires w and h to be positve
         void clearLevel()
         {
@@ -69,6 +69,7 @@ public class MapGenerator : MonoBehaviour
         // this is public so can be called from outside
         public void Generate()
         {
+            // inital put shit on the map
             for(int x = 1; x < width-1; x++)
             {
                 for(int y = 1; y < height-1; y++)
@@ -77,11 +78,38 @@ public class MapGenerator : MonoBehaviour
                     map[x,y] = val;
                 }
             }
+
+            // random count of spawners
+            int rng = Random.Range(1,15);
+
+            // place em
+            for(int i = 0; i < rng; i++)
+            {
+                int x = Random.Range(3,width-3);
+                int y = Random.Range(3,height - 3);
+                for(int surX = x - 1; surX <= x + 1; surX++)
+                {
+                    for(int surY = y - 1; surY <= y + 1; surY++)
+                    {
+                        map[surX,surY] = 0;
+                    }
+                }
+                map[x,y] = 2;
+            }
+
+        }
+
+        private void makeInto(int x, int y, int result)
+        {
+            if(map[x,y] != 2)
+            {
+                map[x,y] = result;
+            }
         }
 
         // cleans up the map to be less shit
         // this is public so can be called from outside
-        public void CleanUp()
+        public void CleanUp(int spawnX,int spawnY)
         {
             // make 3 horizontal and 4 vertical hallways
             var row1 = Random.Range(2,height/3);
@@ -95,18 +123,30 @@ public class MapGenerator : MonoBehaviour
             // slice
             for(int x = 1; x < width-1; x++)
             {
-                map[x,row1] = 0;
-                map[x,row2] = 0;
-                map[x,row3] = 0;
+                makeInto(x,row1,0);
+                makeInto(x,row2,0);
+                makeInto(x,row3,0);
             }
 
             // slice
             for(int y = 1; y < height-1; y++)
             {
-                map[col1,y] = 0;
-                map[col2,y] = 0;
-                map[col3,y] = 0;
-                map[col4,y] = 0;
+                makeInto(col1,y,0);
+                makeInto(col2,y,0);
+                makeInto(col3,y,0);
+                makeInto(col4,y,0);
+            }
+
+            // clear area around player acts as spawn;
+            for(int x = spawnX - 1; x <= spawnX + 1; x++)
+            {
+                for(int y = spawnY - 1; y <= spawnY + 1; y++)
+                { 
+                    if(x!=0 && x != width-1 && y != 0 && y != height-1)
+                    {
+                        makeInto(x,y,0);
+                    }
+                }
             }
 
             // soften
@@ -141,11 +181,11 @@ public class MapGenerator : MonoBehaviour
                     {
                         if(curVal == 1)
                         {
-                            map[x,y] = 0;
+                            makeInto(x,y,0);
                         }
                         else if(curVal == 0)
                         {
-                            map[x,y] = 1;
+                            makeInto(x,y,1);
                         }
                     }
                 }
@@ -153,12 +193,21 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    
+
     public level bestLevel;
+
+    public GameObject spawnerPrefab;
 
     public Tile groundTile;
 	public Tile wallTile;
 	public Tilemap ground;
 	public Tilemap wall;
+    public GameManager gameMan;
+
+    public Transform playerLoc;
+    public Vector3 spawn;
+    public Vector3Int mapSpawn;
 
     void DrawMap(level lvl)
 	{
@@ -178,6 +227,13 @@ public class MapGenerator : MonoBehaviour
 					ground.SetTile(tilePos,groundTile);
 					wall.SetTile(tilePos,null);
 				}
+                else if(lvl.map[x,y]==2)
+				{
+                    Vector3 destination = ground.GetCellCenterWorld(new Vector3Int(x,y,0));
+					Instantiate(spawnerPrefab, destination, Quaternion.identity);
+                    ground.SetTile(tilePos,groundTile);
+					wall.SetTile(tilePos,null);
+				}
 				else
 				{
 					ground.SetTile(tilePos,null);
@@ -187,20 +243,15 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-    void awake()
+    void Awake()
     {
-
+        
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        // 73 by 33 fills screen
-        level baseMap = new level(73,33);
-        int[,] map = baseMap.getMap();
-        baseMap.Generate();
-        baseMap.CleanUp();
-        DrawMap(baseMap);
+        PutMapOnScreen();
     }
 
     void update()
@@ -215,5 +266,39 @@ public class MapGenerator : MonoBehaviour
         // make a starting population
 
 
+    }
+
+    public void PutMapOnScreen()
+    {
+        // clear all the existing stuffs
+        GameObject[] spawners;
+        GameObject[] enemies;
+        spawners = GameObject.FindGameObjectsWithTag("Spawner");
+        for(int i = 0; i < spawners.Length; i++)
+        {
+            spawners[i].tag = "Untagged";
+            Destroy(spawners[i].gameObject);
+        }
+        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        for(int i = 0; i < enemies.Length; i++)
+        {
+            enemies[i].tag = "Untagged";
+            Destroy(enemies[i].gameObject);
+        }
+
+        spawners = GameObject.FindGameObjectsWithTag("Spawner");
+        //Debug.Log("postKill: "+spawners.Length);
+
+        // make teh new one here
+        spawn = playerLoc.position;
+        mapSpawn = ground.WorldToCell(spawn);
+        // 73 by 33 fills screen
+        level baseMap = new level(73,33);
+        baseMap.Generate();
+        baseMap.CleanUp(mapSpawn.x,mapSpawn.y);
+        DrawMap(baseMap);
+        
+        // last step before running the map
+        gameMan.PrepareSpawners();
     }
 }
