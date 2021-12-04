@@ -30,6 +30,8 @@ public class MapGenerator : MonoBehaviour
         public int[,] map;
         public int width;
         public int height;
+        public int rowCount;
+        public int columnCount;
         public float rating;
 
         // data vars for rating
@@ -140,29 +142,61 @@ public class MapGenerator : MonoBehaviour
             playerSpawn = new Vector3Int(spawnX,spawnY,0);
             
             // make 3 horizontal and 4 vertical hallways
-            var row1 = Random.Range(2,height/3);
-            var row2 = Random.Range(height/3,height/3*2);
-            var row3 = Random.Range(height/3*2,height-2);
-            var col1 = Random.Range(2,width/4);
-            var col2 = Random.Range(width/4,width/4*2);
-            var col3 = Random.Range(width/4*2,width/4*3);
-            var col4 = Random.Range(width/4*3,width-2);
+            rowCount = Random.Range(2,5);
+            columnCount = Random.Range(3,7);
+
+            int[] rows = new int[rowCount];
+            int[] cols = new int[columnCount];
+
+            for(int r = 0; r < rowCount; r++)
+            {
+                if(r==0)
+                {
+                    rows[r] = Random.Range(2,height/((r+1)*rowCount));
+                }
+                else if(r==rowCount-1)
+                {
+                    rows[r] = Random.Range(height/(rowCount*r),height-2);
+                }
+                else
+                {
+                    rows[r] = Random.Range(height/(rowCount*r),height/(r+1*rowCount));
+                }
+            }
+
+            for(int c = 0; c < columnCount; c++)
+            {
+                if(c==0)
+                {
+                    cols[c] = Random.Range(2,width/((c+1)*columnCount));
+                }
+                else if(c==columnCount-1)
+                {
+                    cols[c] = Random.Range(width/(columnCount*c),width-2);
+                }
+                else
+                {
+                    cols[c] = Random.Range(width/(columnCount*c),width/(c+1*columnCount));
+                }
+            }
+
 
             // slice
-            for(int x = 1; x < width-1; x++)
-            {
-                makeInto(x,row1,0);
-                makeInto(x,row2,0);
-                makeInto(x,row3,0);
+            for(int r = 0; r < rowCount; r++)
+            {   
+                for(int x = 1; x < width-1; x++)
+                {
+                    makeInto(x,rows[r],0);
+                }
             }
 
             // slice
-            for(int y = 1; y < height-1; y++)
-            {
-                makeInto(col1,y,0);
-                makeInto(col2,y,0);
-                makeInto(col3,y,0);
-                makeInto(col4,y,0);
+            for(int c = 0; c < columnCount; c++)
+            {   
+                for(int y = 1; y < height-1; y++)
+                {
+                    makeInto(cols[c],y,0);
+                }
             }
 
             // clear area around player acts as spawn;
@@ -218,16 +252,59 @@ public class MapGenerator : MonoBehaviour
                     }
                 }
             }
-        player.GetComponent<PlayerScript>().copyMap(map, width, height);
+            player.GetComponent<PlayerScript>().copyMap(map, width, height);
         }
     
         // goal of this is to rate the level itself
         // rate must be called after CleanUp()
-        public float rate()
+        public float rate(GameObject player)
         {
+            // load the trackers in
+            float remainingHealth = player.GetComponent<PlayerScript>().GetHealthEnd();
+            int remainingZombies = player.GetComponent<PlayerScript>().GetTotalZombies();
+            int killedZombies = player.GetComponent<PlayerScript>().GetTotalKilled();
+            float timeToFinish = player.GetComponent<PlayerScript>().GetTimeToFinishLevel();
+            float pSpawnX = player.GetComponent<PlayerScript>().GetStartX();
+            float pSpawnY = player.GetComponent<PlayerScript>().GetStartY();
+            int playerItems = player.GetComponent<PlayerScript>().GetItemsCollected();
+            int spawnersDestroyed = player.GetComponent<PlayerScript>().GetSpawnerDestroyed();
+            int spawnerCount = player.GetComponent<PlayerScript>().GetSpawnerGen();
+            int[,] explored = player.GetComponent<PlayerScript>().explored;
+            float totalSpawnerLife = player.GetComponent<PlayerScript>().gameManager.totalTimeOfSpawners;
+            
+            // extra variables assignment
+            float beatAbilty = 10f;
+            float pathValidity = validPath();
+            float spawnerDistance = averageDistancetoSpawner();
+            float wallToTotal = ratioOfWalltoFloor();
+            float vertical = columnCount/7;
+            float horizontal = rowCount/5;
+
+            
+            // area for math n stuff
+            float doablity = pathValidity * beatAbilty;
+            // if hp is high then put more weight on higher spawner counts
+            // if hp is low put more wieght on less spawner count
+            // if remainingHealth/200 is similar to spawnerCount/15 mucho bueno
+            float hpSpawnerRatio = (1f-(Mathf.Abs(remainingHealth/200 - spawnerCount/15)));            
+
+            // if time to finish is low then favor farther spawners
+            float timetoSpawnerDistance = (80-timeToFinish)/60*(spawnerDistance/40);
+            
+            // if explored has a high amount of exploration (AKA many 3's) favor increased walls
+            // if they explore a ton then wall matter, if they don't explore alot then walls mean less
+            float explorationtoWall = numberof3s(explored) * ratioOfWalltoFloor();
+
+            // if killedZombies is high and player hp is high then favor more vertical
+            // more player powerups mean increase difficulty
+            float verticalRating = (playerItems)*(remainingHealth/200)*vertical;
+            float horizontalRating = (2-playerItems)*(1-remainingHealth/200)*horizontal;
+
+            // additive polish metrics make a elite spawner if need mo difficult
 
 
-            return 0f;
+
+            return doablity+hpSpawnerRatio+timetoSpawnerDistance+explorationtoWall+verticalRating+horizontalRating;
         }
 
         // area for rate() helper functions
@@ -303,6 +380,55 @@ public class MapGenerator : MonoBehaviour
                 }
             }
             return numberReached/(float)spawnerCount;
+        }
+
+        public float averageDistancetoSpawner()
+        {
+            float total = 0;
+            for(int i = 0; i < spawnerCount; i++)
+            {
+                total += Vector3Int.Distance(spawners[i],playerSpawn);
+            }
+
+            return total/spawnerCount;
+        }
+    
+        public float ratioOfWalltoFloor()
+        {
+            float wallCount = 0;
+            float totalCount = 2201;
+            for(int x = 1; x < width-1; x++)
+            {
+                for(int y = 1; y < height-1; y++)
+                {
+                    if(map[x,y]==1)
+                    {
+                        wallCount++;
+                    }
+                }
+            }
+            return wallCount/totalCount;
+        }
+    
+        public float numberof3s(int[,] explored)
+        {
+            float threeCount = 0;
+            float zeroCount = 0;
+            for(int x = 1; x < width-1; x++)
+            {
+                for(int y = 1; y < height-1; y++)
+                {
+                    if(explored[x,y]==3)
+                    {
+                        threeCount++;
+                    }
+                    if(map[x,y]==0)
+                    {
+                        zeroCount++;
+                    }
+                }
+            }
+            return threeCount/zeroCount;
         }
     }
 
@@ -385,12 +511,20 @@ public class MapGenerator : MonoBehaviour
 
     public void PutMapOnScreen()
     {
+        // make sure trackers are up to date
+        GameObject player;
+        player = gameMan.player;
+        player.GetComponent<PlayerScript>().SetHealthEnd();
+        player.GetComponent<PlayerScript>().SetTimeToFinishLevel();
+        player.GetComponent<PlayerScript>().SetStartPostion();
+
         // clear all the existing stuffs
         GameObject[] spawners;
         GameObject[] enemies;
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         for(int i = 0; i < spawners.Length; i++)
         {
+
             spawners[i].tag = "Untagged";
             Destroy(spawners[i].gameObject);
         }
@@ -411,22 +545,18 @@ public class MapGenerator : MonoBehaviour
         level baseMap = new level(73,33);
         baseMap.Generate();
         baseMap.CleanUp(mapSpawn.x,mapSpawn.y);
-        float paths = baseMap.validPath();
-        Debug.Log("Percent of spawners Reachbale:"+paths);
+        
+        // rating here
+        baseMap.rate(player);
 
         DrawMap(baseMap);
         
-        // last step before running the map
         gameMan.PrepareSpawners();
 
-        //update trackers
-        GameObject player;
-        player = GameObject.FindGameObjectWithTag("Player");
-        player.GetComponent<PlayerScript>().SetHealthEnd();
-        player.GetComponent<PlayerScript>().SetTimeToFinishLevel();
-        player.GetComponent<PlayerScript>().SetStartPostion();
+        // reset trackers        
         player.GetComponent<PlayerScript>().totalKilled = 0;
         player.GetComponent<PlayerScript>().totalZombies = 0;
         player.GetComponent<PlayerScript>().spawnerDestroyed = 0;
+        gameMan.totalTimeOfSpawners = 0;
     }
 }

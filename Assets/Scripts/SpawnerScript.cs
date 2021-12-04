@@ -94,8 +94,9 @@ public class SpawnerScript : MonoBehaviour
 
     public void DestroySpawner()
     {
-        Destroy(gameObject);
+        gameManager.totalTimeOfSpawners += getActiveTime();
         player.GetComponent<PlayerScript>().SetSpawnerDestroyed();
+        Destroy(gameObject);
     }
 
     private void DefaultColor()

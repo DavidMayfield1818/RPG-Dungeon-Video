@@ -7,7 +7,7 @@ public class PlayerScript : MonoBehaviour
 {
     private float horizontal;
     private float vertical;
-    private float speed = 2.5f;
+    private float speed = 2.0f;
     Rigidbody2D rb;
 
     private float health = 200;
@@ -35,6 +35,8 @@ public class PlayerScript : MonoBehaviour
     public Text mainText;
     public Image redOverlay;
     public Text expText;
+
+    public GameManager gameManager;
 
     private int experience = 0;
 

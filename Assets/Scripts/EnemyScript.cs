@@ -8,8 +8,8 @@ public class EnemyScript : MonoBehaviour
     private Transform target;
     private float minDistance = 5.0f;
     private bool targetCollision = false;
-    private float speed = 1.5f;
-    private float thrust = 1.25f;
+    private float speed = 0.5f;
+    private float thrust = 0.5f;
     public float health = 5;
     private int hitStrength = 10;
 
@@ -89,6 +89,7 @@ public class EnemyScript : MonoBehaviour
             Invoke("EnemyDeath", 1.5f);
         } else
         {
+            Invoke("FalseCollision", 0.5f);
             transform.GetChild(0).gameObject.SetActive(true);
             Invoke("HideBlood", 0.25f);
         }
