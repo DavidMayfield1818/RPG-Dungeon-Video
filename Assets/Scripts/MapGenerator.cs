@@ -10,11 +10,33 @@ public class MapGenerator : MonoBehaviour
     public static GameObject player;
     public class level
     {
+        public class node
+        {
+            public Vector3Int loc;
+            public int distTraveled;
+            public float distToGo;
+            public node parent;
+
+            public node(Vector3Int L, int T, float TG, node P){
+                loc = L;
+                distTraveled = T;
+                distToGo = TG;
+                parent = P;
+            }
+        }
+
         // this class contains one level
         // variables here
         public int[,] map;
         public int width;
         public int height;
+        public float rating;
+
+        // data vars for rating
+        public Vector3Int playerSpawn;
+        public int spawnerCount;
+        public Vector3Int[] spawners;
+
         // contructor
         // this is public so can be called from outside
         public level(int w, int h)
@@ -79,12 +101,13 @@ public class MapGenerator : MonoBehaviour
             }
 
             // random count of spawners
-            int rng = Random.Range(1,15);
+            spawnerCount = Random.Range(1,15);
+            spawners = new Vector3Int[spawnerCount];
             //track spawners generated 
             player = GameObject.FindGameObjectWithTag("Player");
-            player.GetComponent<PlayerScript>().SetSpawnerGen(rng);
+            player.GetComponent<PlayerScript>().SetSpawnerGen(spawnerCount);
             // place em
-            for(int i = 0; i < rng; i++)
+            for(int i = 0; i < spawnerCount; i++)
             {
                 int x = Random.Range(3,width-3);
                 int y = Random.Range(3,height - 3);
@@ -96,10 +119,12 @@ public class MapGenerator : MonoBehaviour
                     }
                 }
                 map[x,y] = 2;
+                spawners[i] = new Vector3Int(x,y,0);
             }
 
         }
 
+        // helper placement function
         private void makeInto(int x, int y, int result)
         {
             if(map[x,y] != 2)
@@ -112,6 +137,8 @@ public class MapGenerator : MonoBehaviour
         // this is public so can be called from outside
         public void CleanUp(int spawnX,int spawnY)
         {
+            playerSpawn = new Vector3Int(spawnX,spawnY,0);
+            
             // make 3 horizontal and 4 vertical hallways
             var row1 = Random.Range(2,height/3);
             var row2 = Random.Range(height/3,height/3*2);
@@ -192,6 +219,90 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         player.GetComponent<PlayerScript>().copyMap(map, width, height);
+        }
+    
+        // goal of this is to rate the level itself
+        // rate must be called after CleanUp()
+        public float rate()
+        {
+
+
+            return 0f;
+        }
+
+        // area for rate() helper functions
+        // find path from player spawn to every spawner
+        // returns number of spawners that were reached/total spawners
+        public float validPath()
+        {
+            float numberReached = 0;
+            // try and find every spawner
+            for(int i = 0; i < spawnerCount;i++)
+            {
+
+                int[,] travelled = new int[width,height];
+                for(int w = 0; w < width; w++)
+                {
+                    for(int h = 0; h < height; h++);
+                }
+                Vector3Int curSpawner = spawners[i];
+                bool notFound = true;
+
+                // set up an array of nodes
+                Dictionary<int,node> nodes = new Dictionary<int, node>();
+                int currentKey = 0;
+                nodes.Add(currentKey,new node(playerSpawn,0,Vector3Int.Distance(playerSpawn,curSpawner),null));
+                currentKey++;
+
+                // Q is a sorted list... like a dict is has a key and value, sorted based on value
+                SortedList Q = new SortedList();
+
+                // Q.Add(key: new node(loc,distTravled,distToGo),value: distToGo+distTravled)
+                Q.Add(0,Vector3Int.Distance(playerSpawn,curSpawner)+0);
+
+                // start of queue is set
+
+                while(notFound && Q.Count!=0)
+                {
+                    // get the node
+                    node N = nodes[(int)Q.GetKey(0)];
+                    travelled[N.loc.x,N.loc.y]=2;
+                    Q.RemoveAt(0);
+
+                    // break the loop
+                    if(N.loc.x==curSpawner.x && N.loc.y==curSpawner.y)
+                    {
+                        // Found the spawner
+                        notFound = false;
+                        numberReached++;
+                        curSpawner.z = N.distTraveled;
+                    }
+
+                    // set up children
+                    Vector3Int[] children = new Vector3Int[4];
+                    children[0] = new Vector3Int(N.loc.x+1,N.loc.y+0,N.loc.z);
+                    children[1] = new Vector3Int(N.loc.x-1,N.loc.y+0,N.loc.z);
+                    children[2] = new Vector3Int(N.loc.x+0,N.loc.y+1,N.loc.z);
+                    children[3] = new Vector3Int(N.loc.x+0,N.loc.y-1,N.loc.z);
+                    
+                    for(int c = 0; c < 4; c++)
+                    {
+                        // if empty or spawner AND we haven't seen it yet add it to the Q
+                        if((map[children[c].x,children[c].y]==0 || map[children[c].x,children[c].y]==2) && travelled[children[c].x,children[c].y]==0)
+                        {
+                            // make the child into a node casue its valid
+                            // node(vector3int position, distance traveled, distance to go, parent)
+                            node childnode = new node(children[c],N.distTraveled+1,Vector3Int.Distance(N.loc,curSpawner),N);
+                            nodes.Add(currentKey,childnode);
+                            travelled[children[c].x,children[c].y]=1;
+                            Q.Add(currentKey,childnode.distTraveled+childnode.distToGo);
+                            currentKey++;
+                        }
+                    }
+                    // end children setup
+                }
+            }
+            return numberReached/(float)spawnerCount;
         }
     }
 
@@ -300,6 +411,9 @@ public class MapGenerator : MonoBehaviour
         level baseMap = new level(73,33);
         baseMap.Generate();
         baseMap.CleanUp(mapSpawn.x,mapSpawn.y);
+        float paths = baseMap.validPath();
+        Debug.Log("Percent of spawners Reachbale:"+paths);
+
         DrawMap(baseMap);
         
         // last step before running the map
