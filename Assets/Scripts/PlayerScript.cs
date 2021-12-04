@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -37,12 +38,12 @@ public class PlayerScript : MonoBehaviour
     public Text expText;
 
     public GameManager gameManager;
+    public Tilemap floor;
 
     private int experience = 0;
 
     void Start()
     {
-        
         rb = GetComponent<Rigidbody2D>();
         healthWidth = healthFill.sprite.rect.width;
         startHealth = health;
@@ -154,11 +155,12 @@ public class PlayerScript : MonoBehaviour
     }
 
     public void copyMap(int[,] map, int width , int height){
-        explored = map;    
+        explored = map;
     }
     public void updateExplored(){
-        explored[(int)GameObject.FindGameObjectWithTag("Player").transform.position.x,
-         (int)GameObject.FindGameObjectWithTag("Player").transform.position.y] = 3; 
+        Vector3Int curPos = floor.WorldToCell(this.transform.position);
+        
+        explored[curPos.x,curPos.y] = 3;
     }
 
     // end of trackers
@@ -201,6 +203,18 @@ public class PlayerScript : MonoBehaviour
     {
         mainText.gameObject.SetActive(false);
         redOverlay.gameObject.SetActive(false);
+    }
+
+    public void setupExplored()
+    {
+        explored = new int[73,33];
+        for(int x = 0; x < 73; x++)
+        {
+            for(int y = 0; y < 33; y++)
+            {
+                explored[x,y] = 0;
+            }
+        }
     }
 
 }

@@ -92,6 +92,10 @@ public class MapGenerator : MonoBehaviour
         // this is public so can be called from outside
         public void Generate()
         {
+            // define number or rows and columns
+            rowCount = Random.Range(2,5);
+            columnCount = Random.Range(3,7);
+
             // inital put shit on the map
             for(int x = 1; x < width-1; x++)
             {
@@ -140,10 +144,6 @@ public class MapGenerator : MonoBehaviour
         public void CleanUp(int spawnX,int spawnY)
         {
             playerSpawn = new Vector3Int(spawnX,spawnY,0);
-            
-            // make 3 horizontal and 4 vertical hallways
-            rowCount = Random.Range(2,5);
-            columnCount = Random.Range(3,7);
 
             int[] rows = new int[rowCount];
             int[] cols = new int[columnCount];
@@ -252,7 +252,6 @@ public class MapGenerator : MonoBehaviour
                     }
                 }
             }
-            player.GetComponent<PlayerScript>().copyMap(map, width, height);
         }
     
         // goal of this is to rate the level itself
@@ -277,33 +276,39 @@ public class MapGenerator : MonoBehaviour
             float pathValidity = validPath();
             float spawnerDistance = averageDistancetoSpawner();
             float wallToTotal = ratioOfWalltoFloor();
-            float vertical = columnCount/7;
-            float horizontal = rowCount/5;
+            float vertical = (float)columnCount/7;
+            float horizontal = (float)rowCount/5;
 
             
             // area for math n stuff
             float doablity = pathValidity * beatAbilty;
+            Debug.Log("doablity: "+doablity);
             // if hp is high then put more weight on higher spawner counts
             // if hp is low put more wieght on less spawner count
             // if remainingHealth/200 is similar to spawnerCount/15 mucho bueno
-            float hpSpawnerRatio = (1f-(Mathf.Abs(remainingHealth/200 - spawnerCount/15)));            
+            float hpSpawnerRatio = (1f-(Mathf.Abs(remainingHealth/200f - spawnerCount/15f)));            
+            Debug.Log("hpSpawnerRatio: "+hpSpawnerRatio);
 
             // if time to finish is low then favor farther spawners
-            float timetoSpawnerDistance = (80-timeToFinish)/60*(spawnerDistance/40);
-            
+            float timetoSpawnerDistance = (80f-timeToFinish)/60f*(spawnerDistance/40f);
+            Debug.Log("timetoSpawnerDistance: "+timetoSpawnerDistance);
+
             // if explored has a high amount of exploration (AKA many 3's) favor increased walls
             // if they explore a ton then wall matter, if they don't explore alot then walls mean less
             float explorationtoWall = numberof3s(explored) * ratioOfWalltoFloor();
+            Debug.Log("explorationtoWall: "+explorationtoWall);
 
             // if killedZombies is high and player hp is high then favor more vertical
             // more player powerups mean increase difficulty
-            float verticalRating = (playerItems)*(remainingHealth/200)*vertical;
-            float horizontalRating = (2-playerItems)*(1-remainingHealth/200)*horizontal;
+            float verticalRating = (playerItems)*(remainingHealth/200f)*vertical;
+            float horizontalRating = (2-playerItems)*(1-remainingHealth/200f)*horizontal;
+            Debug.Log("verticalRating: "+verticalRating);
+            Debug.Log("horizontalRating: "+horizontalRating);
 
             // additive polish metrics make a elite spawner if need mo difficult
 
 
-
+            Debug.Log("Total: "+(doablity+hpSpawnerRatio+timetoSpawnerDistance+explorationtoWall+verticalRating+horizontalRating));
             return doablity+hpSpawnerRatio+timetoSpawnerDistance+explorationtoWall+verticalRating+horizontalRating;
         }
 
@@ -428,7 +433,7 @@ public class MapGenerator : MonoBehaviour
                     }
                 }
             }
-            return threeCount/zeroCount;
+            return threeCount/(zeroCount/2f);
         }
     }
 
@@ -492,6 +497,7 @@ public class MapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gameMan.player.GetComponent<PlayerScript>().setupExplored();
         PutMapOnScreen();
     }
 
@@ -548,9 +554,10 @@ public class MapGenerator : MonoBehaviour
         
         // rating here
         baseMap.rate(player);
+        player.GetComponent<PlayerScript>().copyMap(baseMap.map, baseMap.width, baseMap.height);
 
         DrawMap(baseMap);
-        
+
         gameMan.PrepareSpawners();
 
         // reset trackers        
