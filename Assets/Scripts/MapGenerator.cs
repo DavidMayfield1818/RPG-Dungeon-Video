@@ -256,7 +256,7 @@ public class MapGenerator : MonoBehaviour
     
         // goal of this is to rate the level itself
         // rate must be called after CleanUp()
-        public float rate(GameObject player)
+        public float rate(GameObject player, bool verbose)
         {
             // load the trackers in
             float remainingHealth = player.GetComponent<PlayerScript>().GetHealthEnd();
@@ -279,37 +279,44 @@ public class MapGenerator : MonoBehaviour
             float vertical = (float)columnCount/7;
             float horizontal = (float)rowCount/5;
 
-            
             // area for math n stuff
             float doablity = pathValidity * beatAbilty;
-            Debug.Log("doablity: "+doablity);
+            
             // if hp is high then put more weight on higher spawner counts
             // if hp is low put more wieght on less spawner count
             // if remainingHealth/200 is similar to spawnerCount/15 mucho bueno
             float hpSpawnerRatio = (1f-(Mathf.Abs(remainingHealth/200f - spawnerCount/15f)));            
-            Debug.Log("hpSpawnerRatio: "+hpSpawnerRatio);
 
             // if time to finish is low then favor farther spawners
-            float timetoSpawnerDistance = (80f-timeToFinish)/60f*(spawnerDistance/40f);
-            Debug.Log("timetoSpawnerDistance: "+timetoSpawnerDistance);
-
+            float timetoSpawnerDistance = (100f-timeToFinish)/80f*(spawnerDistance/40f);
+            
             // if explored has a high amount of exploration (AKA many 3's) favor increased walls
             // if they explore a ton then wall matter, if they don't explore alot then walls mean less
             float explorationtoWall = numberof3s(explored) * ratioOfWalltoFloor();
-            Debug.Log("explorationtoWall: "+explorationtoWall);
-
+            
             // if killedZombies is high and player hp is high then favor more vertical
             // more player powerups mean increase difficulty
-            float verticalRating = (playerItems)*(remainingHealth/200f)*vertical;
+            float verticalRating = (playerItems)*((remainingHealth+50)/200f)*vertical;
             float horizontalRating = (2-playerItems)*(1-remainingHealth/200f)*horizontal;
-            Debug.Log("verticalRating: "+verticalRating);
-            Debug.Log("horizontalRating: "+horizontalRating);
 
+            // if player has more wepon upgrade wieght towards more spawners
+            float weaponUpgradetoSpawnerCount = (playerItems)*(spawnerCount/15f);
+            
             // additive polish metrics make a elite spawner if need mo difficult
 
+            if(verbose)
+            {
+                Debug.Log("doablity: "+doablity);
+                Debug.Log("hpSpawnerRatio: "+hpSpawnerRatio);
+                Debug.Log("timetoSpawnerDistance: "+timetoSpawnerDistance);
+                Debug.Log("explorationtoWall: "+explorationtoWall);
+                Debug.Log("verticalRating: "+verticalRating);
+                Debug.Log("horizontalRating: "+horizontalRating);
+                Debug.Log("weaponUpgradetoSpawnerCount: "+weaponUpgradetoSpawnerCount);
+                Debug.Log("Total: "+(doablity+hpSpawnerRatio+timetoSpawnerDistance+explorationtoWall+verticalRating+horizontalRating+weaponUpgradetoSpawnerCount));
+            }
 
-            Debug.Log("Total: "+(doablity+hpSpawnerRatio+timetoSpawnerDistance+explorationtoWall+verticalRating+horizontalRating));
-            return doablity+hpSpawnerRatio+timetoSpawnerDistance+explorationtoWall+verticalRating+horizontalRating;
+            return doablity+hpSpawnerRatio+timetoSpawnerDistance+explorationtoWall+verticalRating+horizontalRating+weaponUpgradetoSpawnerCount;
         }
 
         // area for rate() helper functions
@@ -541,26 +548,40 @@ public class MapGenerator : MonoBehaviour
             Destroy(enemies[i].gameObject);
         }
 
-        spawners = GameObject.FindGameObjectsWithTag("Spawner");
+        //spawners = GameObject.FindGameObjectsWithTag("Spawner");
         //Debug.Log("postKill: "+spawners.Length);
 
-        // make teh new one here
+        // make the new one here
+        // --------------------------------------------------------------------------------
+        // setup some creation variables
         spawn = playerLoc.position;
         mapSpawn = ground.WorldToCell(spawn);
-        // 73 by 33 fills screen
-        level baseMap = new level(73,33);
-        baseMap.Generate();
-        baseMap.CleanUp(mapSpawn.x,mapSpawn.y);
-        
-        // rating here
-        baseMap.rate(player);
-        player.GetComponent<PlayerScript>().copyMap(baseMap.map, baseMap.width, baseMap.height);
+        int popCount = 1000;
 
-        DrawMap(baseMap);
+        // new stuff here -----------------------------------------------------------------
+        level bestLevel = new level(73,33);
+        float bestLevelScore = -1;
+        for(int i = 0; i < popCount; i++)
+        {
+            level currentLevel = new level(73,33);
+            currentLevel.Generate();
+            currentLevel.CleanUp(mapSpawn.x,mapSpawn.y);
+            float currentScore = currentLevel.rate(player,false);
+            if(currentScore > bestLevelScore)
+            {
+                bestLevel = currentLevel;
+                bestLevelScore = currentScore;
+            }
+        }
 
+        // --------------------------------------------------------------------------------
+        // draw the ouput ot the previous section
+        DrawMap(bestLevel);
         gameMan.PrepareSpawners();
+        bestLevel.rate(player,true);
 
-        // reset trackers        
+        // reset trackers
+        player.GetComponent<PlayerScript>().copyMap(bestLevel.map, bestLevel.width, bestLevel.height);
         player.GetComponent<PlayerScript>().totalKilled = 0;
         player.GetComponent<PlayerScript>().totalZombies = 0;
         player.GetComponent<PlayerScript>().spawnerDestroyed = 0;

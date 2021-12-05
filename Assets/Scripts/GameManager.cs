@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     private int level = 0;
     private int currentScene = 0;
     private int zombieCount = 0;
-    private int zombieLimit = 10;
+    private int zombieLimit = 30;
 
     public float totalTimeOfSpawners = 0;
   

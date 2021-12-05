@@ -11,7 +11,7 @@ public class PlayerScript : MonoBehaviour
     private float speed = 2.0f;
     Rigidbody2D rb;
 
-    private float health = 200;
+    private float health = 300;
     private float startHealth;
     
     //Trackers for map generation 
@@ -161,6 +161,11 @@ public class PlayerScript : MonoBehaviour
         Vector3Int curPos = floor.WorldToCell(this.transform.position);
         
         explored[curPos.x,curPos.y] = 3;
+        explored[curPos.x+1,curPos.y] = 3;
+        explored[curPos.x-1,curPos.y] = 3;
+        explored[curPos.x,curPos.y+1] = 3;
+        explored[curPos.x,curPos.y-1] = 3;
+
     }
 
     // end of trackers
