@@ -183,7 +183,9 @@ MonoBehaviour:
   - {fileID: 2668914277195830529}
   deathSprite: {fileID: 21300000, guid: f76de26c5d9a8c64a9d2e7a383f28a2c, type: 3}
   gateway: {fileID: 21300000, guid: d0faeb8a67b32c84b887bfe655ed1ac8, type: 3}
+  isGateway: 0
   weaponUpgrade: {fileID: 21300000, guid: e9d2ad3427e01e043982a232c187e796, type: 3}
+  HealthPotion: {fileID: 21300000, guid: 2b58c70275eda8f46bb5dab5835c924e, type: 3}
   sprites:
   - {fileID: 21300000, guid: 3511811cbeec7214ca7e962de2c0ce55, type: 3}
   - {fileID: 21300000, guid: 278e2c17431649c429f01b191e62b838, type: 3}
@@ -193,6 +195,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 700c3428d7ebee64790788859ecaff68, type: 3}
   player: {fileID: 0}
   activeTime: 0
+  Gen: {fileID: 0}
 --- !u!1 &2668914279218925427
 GameObject:
   m_ObjectHideFlags: 0

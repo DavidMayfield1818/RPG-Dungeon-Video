@@ -27,7 +27,7 @@ public class PlayerScript : MonoBehaviour
     public int spawnersGen = 0;
     public int[,] explored;
     
-    //
+    //end of trackers
 
     public bool turnedLeft = false;
     public Image healthFill;
@@ -169,6 +169,16 @@ public class PlayerScript : MonoBehaviour
     }
 
     // end of trackers
+
+        public void UseHealthPotion()
+    {
+        if(health > 100){
+            health = 200; // make sure potion doesnt go over max health 
+        }
+        else{
+            health += 100; // change to fit
+        }
+    }
  
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -190,6 +200,7 @@ public class PlayerScript : MonoBehaviour
         else if (collision.gameObject.CompareTag("Spawner"))
         {
             collision.gameObject.GetComponent<SpawnerScript>().GetGatewayWeapon();
+            collision.gameObject.GetComponent<SpawnerScript>().GetGatewayPotion();
         }
     }
 

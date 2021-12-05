@@ -17,6 +17,9 @@ public class SpawnerScript : MonoBehaviour
     public Sprite weaponUpgrade;
     private bool isWeaponUpgrade = false;
 
+    public Sprite HealthPotion;
+    private bool isHealthPotion = false;
+
     public Sprite[] sprites;
 
     private GameManager gameManager;
@@ -70,6 +73,10 @@ public class SpawnerScript : MonoBehaviour
                 else if (isWeaponUpgrade)
                 {
                     Invoke("OpenWeapon", 0.5f);
+                }
+                else if (isHealthPotion)
+                {
+                    Invoke("OpenHealthPotion", 0.5f);
                 } else
                 {
                     Invoke("DestroySpawner", 0.6f);
@@ -130,6 +137,22 @@ public class SpawnerScript : MonoBehaviour
         }
     }
 
+    public void GetGatewayPotion()
+        {
+            if(GetComponent<SpriteRenderer>().sprite == gateway)
+            {
+                // change how dis works here
+                Gen.PutMapOnScreen();
+
+            } else if (GetComponent<SpriteRenderer>().sprite == HealthPotion)
+            {
+                GameObject.Find("Player").GetComponent<PlayerScript>().UseHealthPotion();
+                Destroy(gameObject);
+                player = GameObject.FindGameObjectWithTag("Player");
+                player.GetComponent<PlayerScript>().SetItemsCollected();
+            }
+        }
+
     public void SetWeapon(bool maybe)
     {
         isWeaponUpgrade = true;
@@ -139,5 +162,14 @@ public class SpawnerScript : MonoBehaviour
     private void OpenWeapon()
     {
         GetComponent<SpriteRenderer>().sprite = weaponUpgrade;
+    }
+    
+    public void SetHealthPotion(bool maybe)
+    {
+        isHealthPotion = true;
+    }
+
+    private void OpenHealthPotion(){
+        GetComponent<SpriteRenderer>().sprite = HealthPotion;
     }
 }

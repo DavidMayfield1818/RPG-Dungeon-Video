@@ -60,6 +60,13 @@ public class GameManager : MonoBehaviour
                 int randTemp = Random.Range(0, spawners.Length);
                 spawners[randTemp].GetComponent<SpawnerScript>().SetWeapon(true);
             }
+            // random for potion testing, current 1 per map
+            // change health increase in usehealth potion in playerScript
+            if(Random.Range(0, 0) == 0)
+            {
+                int randTemp = Random.Range(0, spawners.Length);
+                spawners[randTemp].GetComponent<SpawnerScript>().SetHealthPotion(true);
+            }
             foreach (GameObject spawner in spawners)
             {
                 spawner.GetComponent<SpawnerScript>().SetHealth(level + Random.Range(3, 6));
