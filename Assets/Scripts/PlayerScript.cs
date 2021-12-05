@@ -172,8 +172,8 @@ public class PlayerScript : MonoBehaviour
 
         public void UseHealthPotion()
     {
-        if(health > 100){
-            health = 200; // make sure potion doesnt go over max health 
+        if(health > 200){
+            health = 300; // make sure potion doesnt go over max health 
         }
         else{
             health += 100; // change to fit
