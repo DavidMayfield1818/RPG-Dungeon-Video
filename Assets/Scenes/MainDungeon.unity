@@ -154,6 +154,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnerPrefab: {fileID: 2668914277889835139, guid: 2d8ad1e39bd8a1a47b77f8655316639d,
     type: 3}
+  groundTile0: {fileID: 11400000, guid: d26285ca2a07ba14ba8485dae61d5c41, type: 2}
+  groundTile1: {fileID: 11400000, guid: e34ffd65d5283b44d8cd66605b72a86a, type: 2}
+  groundTile2: {fileID: 11400000, guid: 4f4450f880e0a764daa24a2354e9ec62, type: 2}
+  groundTile3: {fileID: 11400000, guid: 4e832da76b61a2d42904046d924f11dd, type: 2}
+  groundTile4: {fileID: 11400000, guid: 9a7988b3a30f401409066b2942fa9592, type: 2}
+  wallTile0: {fileID: 11400000, guid: 421334e789af842478e94aa2a2bc0bb9, type: 2}
+  wallTile1: {fileID: 11400000, guid: 6296541a33166c1479bdcb008d539bb9, type: 2}
+  wallTile2: {fileID: 11400000, guid: 6052112830aad3e43a9a688f5d36a8b0, type: 2}
+  wallTile3: {fileID: 11400000, guid: 5a3d803723c63b5469c4f6defc9a059b, type: 2}
+  wallTile4: {fileID: 11400000, guid: 63d2478411f15884fae9fce33b88c587, type: 2}
+  groundTiles: []
+  wallTiles: []
   groundTile: {fileID: 11400000, guid: e34ffd65d5283b44d8cd66605b72a86a, type: 2}
   wallTile: {fileID: 11400000, guid: c61cb6a0776c4ab4fac96d636fe1d0f5, type: 2}
   ground: {fileID: 315298925}
@@ -1583,7 +1595,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 3
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1625,6 +1637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 633757e7742f5e444af72aaaa6d42ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
 --- !u!1 &1660298785
 GameObject:
   m_ObjectHideFlags: 0

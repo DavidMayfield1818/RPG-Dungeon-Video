@@ -3,7 +3,24 @@ guid: 6ab43fd3d10395946a63ce7a24c9954e
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - spawnerPrefab: {instanceID: 0}
+  - groundTile0: {fileID: 11400000, guid: 89494bb4be649344ba0c240e70866bf8, type: 2}
+  - groundTile1: {fileID: 11400000, guid: e34ffd65d5283b44d8cd66605b72a86a, type: 2}
+  - groundTile2: {fileID: 11400000, guid: 9a7988b3a30f401409066b2942fa9592, type: 2}
+  - groundTile3: {fileID: 11400000, guid: 4e832da76b61a2d42904046d924f11dd, type: 2}
+  - groundTile4: {fileID: 11400000, guid: 4e832da76b61a2d42904046d924f11dd, type: 2}
+  - wallTile0: {fileID: 11400000, guid: c61cb6a0776c4ab4fac96d636fe1d0f5, type: 2}
+  - wallTile1: {fileID: 11400000, guid: 59689c7451928a64c98811aacab12e05, type: 2}
+  - wallTile2: {fileID: 11400000, guid: 63d2478411f15884fae9fce33b88c587, type: 2}
+  - wallTile3: {fileID: 11400000, guid: 17781694833db34498a38f9b126d3c6c, type: 2}
+  - wallTile4: {fileID: 11400000, guid: 415efb48a59f99f4db349d3f16e63e3f, type: 2}
+  - groundTile: {instanceID: 0}
+  - wallTile: {instanceID: 0}
+  - ground: {instanceID: 0}
+  - wall: {instanceID: 0}
+  - gameMan: {instanceID: 0}
+  - playerLoc: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -450,8 +450,26 @@ public class MapGenerator : MonoBehaviour
 
     public GameObject spawnerPrefab;
 
+    public Tile groundTile0;
+    public Tile groundTile1;
+    public Tile groundTile2;
+    public Tile groundTile3;
+    public Tile groundTile4;
+
+	public Tile wallTile0;
+    public Tile wallTile1;
+    public Tile wallTile2;
+    public Tile wallTile3;
+    public Tile wallTile4;
+
+    public Tile[] groundTiles;
+	public Tile[] wallTiles;
+
     public Tile groundTile;
 	public Tile wallTile;
+
+
+
 	public Tilemap ground;
 	public Tilemap wall;
     public GameManager gameMan;
@@ -473,7 +491,7 @@ public class MapGenerator : MonoBehaviour
 				if(lvl.map[x,y]==1)
 				{
 					wall.SetTile(tilePos,wallTile);
-					ground.SetTile(tilePos,null);
+					ground.SetTile(tilePos,groundTile);
 				}
 				else if(lvl.map[x,y]==0)
 				{
@@ -504,6 +522,21 @@ public class MapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        groundTiles = new Tile[5];
+        wallTiles = new Tile[5];
+
+        groundTiles[0] = groundTile0;
+        groundTiles[1] = groundTile1;
+        groundTiles[2] = groundTile2;
+        groundTiles[3] = groundTile3;
+        groundTiles[4] = groundTile4;
+
+        wallTiles[0] = wallTile0;
+        wallTiles[1] = wallTile1;
+        wallTiles[2] = wallTile2;
+        wallTiles[3] = wallTile3;
+        wallTiles[4] = wallTile4;
+
         gameMan.player.GetComponent<PlayerScript>().setupExplored();
         PutMapOnScreen();
     }
@@ -557,6 +590,9 @@ public class MapGenerator : MonoBehaviour
         spawn = playerLoc.position;
         mapSpawn = ground.WorldToCell(spawn);
         int popCount = 1000;
+
+        wallTile = wallTiles[Random.Range(0,5)];
+        groundTile = groundTiles[Random.Range(0,5)];
 
         // new stuff here -----------------------------------------------------------------
         level bestLevel = new level(73,33);
