@@ -149,7 +149,6 @@ public class SpawnerScript : MonoBehaviour
                 GameObject.Find("Player").GetComponent<PlayerScript>().UseHealthPotion();
                 Destroy(gameObject);
                 player = GameObject.FindGameObjectWithTag("Player");
-                player.GetComponent<PlayerScript>().SetItemsCollected();
             }
         }
 

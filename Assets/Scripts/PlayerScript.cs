@@ -170,7 +170,7 @@ public class PlayerScript : MonoBehaviour
 
     // end of trackers
 
-        public void UseHealthPotion()
+    public void UseHealthPotion()
     {
         if(health > 200){
             health = 300; // make sure potion doesnt go over max health 
@@ -178,6 +178,8 @@ public class PlayerScript : MonoBehaviour
         else{
             health += 100; // change to fit
         }
+        Vector2 temp = new Vector2(healthWidth * (health / startHealth), healthFill.sprite.rect.height);
+            healthFill.rectTransform.sizeDelta = temp;
     }
  
     private void OnCollisionEnter2D(Collision2D collision)
